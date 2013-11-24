@@ -51,7 +51,8 @@ def solver(method, inst_file_path, solution_file_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Script solving the 0/1 knapsack problem')
-    parser.add_argument('-f', '--inst-file', type=str, dest="inst_file_path", help='Path to inst *.dat file')
+    parser.add_argument('-f', '--inst-file', required=True, type=str, dest="inst_file_path", 
+                        help='Path to inst *.dat file')
     parser.add_argument('-o', type=str, dest="solution_file_path", default="output.sol.dat",
                         help='Path to file where solutions will be saved. Default value: output.sol.dat')
     parser.add_argument('-r', type=int, dest="repeat", default=1,
@@ -60,8 +61,8 @@ if __name__ == "__main__":
                         choices=[BRUTE_FORCE_METHOD, RATIO_GREEDY_METHOD, DYNAMIC_PROGRAMMING_METHOD,
                                  BRANCH_AND_BOUNDS_METHOD, FPTAS_METHOD],
                         help="Solving method. Default value: brute force method")
-    parser.add_argument('-s', type=float, dest="scaling_factor", default=4,
-                        help='Scaling factor for FPTAS algorithm')
+    parser.add_argument('-s', type=float, dest="scaling_factor", default=4.0,
+                        help='Scaling factor for FPTAS algorithm. Default value: 4.0')
     args = parser.parse_args()
 
     # selecting knapsack problem solving method
