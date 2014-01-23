@@ -7,6 +7,7 @@ from branch_bounds import branch_and_bounds
 from brute_force import brute_force
 from dynamic_programming import dynamic_programming
 from fptas import FPTAS
+from genetic import genetic_algorithm
 from ratio_greedy import ratio_greedy
 
 BRUTE_FORCE_METHOD = "brute"
@@ -14,6 +15,7 @@ RATIO_GREEDY_METHOD = "ratio"
 DYNAMIC_PROGRAMMING_METHOD = "dynamic"
 BRANCH_AND_BOUNDS_METHOD = "bandb"
 FPTAS_METHOD = "fptas"
+GENETIC_METHOD = "genetic"
 
 
 def parse_line(line):
@@ -44,7 +46,7 @@ def solver(method, inst_file_path, solution_file_path):
         best_cost, best_combination = method(number, capacity, weight_cost)
         best_combination_str = " ".join("%s" % i for i in best_combination)
         # write best result to file
-        sol_file.write("%s %s %s %s\n" % (inst_id, number, best_cost, best_combination_str))
+        sol_file.write("%s %s %s  %s\n" % (inst_id, number, best_cost, best_combination_str))
 
     inst_file.close()
     sol_file.close()
@@ -59,7 +61,7 @@ if __name__ == "__main__":
                         help='Number of repetitions. Default value: 1')
     parser.add_argument("-m", default=BRUTE_FORCE_METHOD, type=str, dest="method",
                         choices=[BRUTE_FORCE_METHOD, RATIO_GREEDY_METHOD, DYNAMIC_PROGRAMMING_METHOD,
-                                 BRANCH_AND_BOUNDS_METHOD, FPTAS_METHOD],
+                                 BRANCH_AND_BOUNDS_METHOD, FPTAS_METHOD, GENETIC_METHOD],
                         help="Solving method. Default value: brute force method")
     parser.add_argument('-s', type=float, dest="scaling_factor", default=4.0,
                         help='Scaling factor for FPTAS algorithm. Default value: 4.0')
@@ -78,6 +80,8 @@ if __name__ == "__main__":
         if args.scaling_factor <= 1:
             raise Exception("Scaling factor for FPTAS must be greater than 1")
         method = partial(FPTAS, scaling_factor=args.scaling_factor)
+    elif args.method == GENETIC_METHOD:
+        method = genetic_algorithm
     else:
         raise Exception("Unknown solving method")
 
