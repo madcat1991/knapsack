@@ -6,7 +6,6 @@ import random
 STEPS = 100
 ALPHA = 0.85
 TEMP_0 = 100 
-M = 600
 
 
 def genetic_algorithm(number, capacity, weight_cost):
