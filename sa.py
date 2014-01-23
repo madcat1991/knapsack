@@ -3,14 +3,12 @@
 import math
 import random
  
-STEPS = 100
 ALPHA = 0.85
-TEMP_0 = 100 
 
 
-def genetic_algorithm(number, capacity, weight_cost):
-    start_sol = init_solution(weight_cost, max_weight=capacity)
-    best_cost, solution = simulate(start_sol, weight_cost, max_weight=capacity)
+def annealing_algorithm(number, capacity, weight_cost, init_temp=100, steps=100):
+    start_sol = init_solution(weight_cost, capacity)
+    best_cost, solution = simulate(start_sol, weight_cost, capacity, init_temp, steps)
     best_combination = [0] * number
     for idx in solution:
         best_combination[idx] = 1
@@ -60,9 +58,9 @@ def moveto(solution, weight_cost, max_weight):
     return moves
 
 
-def simulate(solution, weight_cost, max_weight):
+def simulate(solution, weight_cost, max_weight, init_temp, steps):
     """Simulated annealing approach for Knapsack problem"""
-    temperature = TEMP_0
+    temperature = init_temp
 
     best = solution
     best_cost = get_cost_and_weight_of_knapsack(solution, weight_cost)[0]
@@ -70,7 +68,7 @@ def simulate(solution, weight_cost, max_weight):
     current_sol = solution
     while True:
         current_cost = get_cost_and_weight_of_knapsack(best, weight_cost)[0]
-        for i in range(0, STEPS):
+        for i in range(0, steps):
             moves = moveto(current_sol, weight_cost, max_weight)
             idx = random.randint(0, len(moves) - 1)
             random_move = moves[idx]

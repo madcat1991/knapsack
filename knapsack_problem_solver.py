@@ -7,7 +7,7 @@ from branch_bounds import branch_and_bounds
 from brute_force import brute_force
 from dynamic_programming import dynamic_programming
 from fptas import FPTAS
-from genetic import genetic_algorithm
+from sa import annealing_algorithm
 from ratio_greedy import ratio_greedy
 
 BRUTE_FORCE_METHOD = "brute"
@@ -15,7 +15,7 @@ RATIO_GREEDY_METHOD = "ratio"
 DYNAMIC_PROGRAMMING_METHOD = "dynamic"
 BRANCH_AND_BOUNDS_METHOD = "bandb"
 FPTAS_METHOD = "fptas"
-GENETIC_METHOD = "genetic"
+GENETIC_METHOD = "sa"
 
 
 def parse_line(line):
@@ -65,6 +65,10 @@ if __name__ == "__main__":
                         help="Solving method. Default value: brute force method")
     parser.add_argument('-s', type=float, dest="scaling_factor", default=4.0,
                         help='Scaling factor for FPTAS algorithm. Default value: 4.0')
+    parser.add_argument('-t', type=int, dest="temperature", default=100,
+                        help='Initial temperature for annealing approach. Default value: 100')
+    parser.add_argument('-n', type=int, dest="steps", default=100,
+                        help='Number of steps for annealing approach iteration. Default value: 100')
     args = parser.parse_args()
 
     # selecting knapsack problem solving method
@@ -81,7 +85,11 @@ if __name__ == "__main__":
             raise Exception("Scaling factor for FPTAS must be greater than 1")
         method = partial(FPTAS, scaling_factor=args.scaling_factor)
     elif args.method == GENETIC_METHOD:
-        method = genetic_algorithm
+        if args.temperature < 1:
+            raise Exception("Initial temperature for annealing approach must be greater than 0")
+        if args.steps < 1:
+            raise Exception("Number of steps for annealing approach iteration must be greater than 0")
+        method = partial(annealing_algorithm, init_temp=args.temperature, steps=args.steps)
     else:
         raise Exception("Unknown solving method")
 
