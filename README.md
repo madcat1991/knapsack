@@ -9,6 +9,7 @@ Here are implemented 5 algorithms:
 * branches and bounds
 * dynamic programming
 * FPTAS (fully polynomial-time approximation scheme)
+* simulated annealing
 
 The main file is: knapsack\_problem\_solver.py
 
