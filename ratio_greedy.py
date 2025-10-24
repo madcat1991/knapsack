@@ -1,7 +1,6 @@
-#coding: utf-8
+from typing import List, Tuple
 
-
-def ratio_greedy(number, capacity, weight_cost):
+def ratio_greedy(number: int, capacity: int, weight_cost: List[Tuple[int, int]]) -> Tuple[int, List[int]]:
     """Greedy 1/0 ratio method for solving knapsack problem
 
     :param number: number of existing items

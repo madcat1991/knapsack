@@ -1,8 +1,8 @@
-#coding: utf-8
 from dynamic_programming import dynamic_programming
+from typing import List, Tuple
 
 
-def FPTAS(number, capacity, weight_cost, scaling_factor=4):
+def FPTAS(number: int, capacity: int, weight_cost: List[Tuple[int, int]], scaling_factor: float = 4) -> Tuple[int, List[int]]:
     """Fully polynomial-time approximation scheme method for solving knapsack problem
 
     :param number: number of existing items
