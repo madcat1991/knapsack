@@ -1,8 +1,8 @@
-#coding: utf-8
 from decorators import memoized
+from typing import List, Tuple
 
 
-def dynamic_programming(number, capacity, weight_cost):
+def dynamic_programming(number: int, capacity: int, weight_cost: List[Tuple[int, int]]) -> Tuple[int, List[int]]:
     """
     Solve the knapsack problem by finding the most valuable
     subsequence of `weight_cost` subject that weighs no more than
@@ -10,8 +10,9 @@ def dynamic_programming(number, capacity, weight_cost):
 
     Top-down solution from: http://codereview.stackexchange.com/questions/20569/dynamic-programming-solution-to-knapsack-problem
 
-    :param weight_cost: is a sequence of pairs (weight, cost)
+    :param number: number of existing items
     :param capacity: is a non-negative integer
+    :param weight_cost: is a sequence of pairs (weight, cost)
 
     :return: a pair whose first element is the sum of costs in the best combination,
     and whose second element is the combination.
@@ -32,7 +33,7 @@ def dynamic_programming(number, capacity, weight_cost):
 
     j = capacity
     result = [0] * number
-    for i in xrange(len(weight_cost), 0, -1):
+    for i in range(len(weight_cost), 0, -1):
         if bestvalue(i, j) != bestvalue(i - 1, j):
             result[i - 1] = 1
             j -= weight_cost[i - 1][0]

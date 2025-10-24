@@ -1,23 +1,23 @@
-#coding: utf-8
 from collections import deque
+from typing import List, Tuple, Any
 
 
-class SimpleQueue(object):
-    def __init__(self):
-        self.buffer = deque()
+class SimpleQueue:
+    def __init__(self) -> None:
+        self.buffer: deque = deque()
 
-    def push(self, value):
+    def push(self, value: Any) -> None:
         self.buffer.appendleft(value)
 
-    def pop(self):
+    def pop(self) -> Any:
         return self.buffer.pop()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.buffer)
 
 
-class Node(object):
-    def __init__(self, level, selected_items, cost, weight, bound):
+class Node:
+    def __init__(self, level: int, selected_items: List[int], cost: float, weight: float, bound: float) -> None:
         self.level = level
         self.selected_items = selected_items
         self.cost = cost
@@ -25,7 +25,7 @@ class Node(object):
         self.bound = bound
 
 
-def branch_and_bounds(number, capacity, weight_cost):
+def branch_and_bounds(number: int, capacity: int, weight_cost: List[Tuple[int, int]]) -> Tuple[int, List[int]]:
     """Branch and bounds method for solving knapsack problem
     http://faculty.cns.uni.edu/~east/teaching/153/branch_bound/knapsack/overview_algorithm.html
 
@@ -77,7 +77,7 @@ def branch_and_bounds(number, capacity, weight_cost):
     return int(best_so_far.cost), best_combination
 
 
-def calculate_bound(node, number, capacity, weight_cost, ratios):
+def calculate_bound(node: Node, number: int, capacity: int, weight_cost: List[Tuple[int, int]], ratios: List[Tuple[int, float]]) -> float:
     if node.weight >= capacity:
         return 0
     else:

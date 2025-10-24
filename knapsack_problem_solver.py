@@ -1,7 +1,7 @@
-#coding: utf-8
 import argparse
 from functools import partial
 from time import time
+from typing import List, Tuple, Callable, Any
 
 from branch_bounds import branch_and_bounds
 from brute_force import brute_force
@@ -18,42 +18,74 @@ FPTAS_METHOD = "fptas"
 GENETIC_METHOD = "sa"
 
 
-def parse_line(line):
+def parse_line(line: str) -> Tuple[int, int, int, List[Tuple[int, int]]]:
     """Line parser method
     :param line: line from input file
     :return: tuple like: (instance id, number of items, knapsack capacity,
                             list of tuples like: [(weight, cost), (weight, cost), ...])
+    :raises ValueError: if line format is invalid
     """
-    parts = [int(value) for value in line.split()]
-    inst_id, number, capacity = parts[0:3]
-    weight_cost = [(parts[i], parts[i + 1]) for i in range(3, len(parts), 2)]
-    return inst_id, number, capacity, weight_cost
+    try:
+        parts = [int(value) for value in line.split()]
+        if len(parts) < 3:
+            raise ValueError("Line must contain at least 3 values (id, number, capacity)")
+
+        inst_id, number, capacity = parts[0:3]
+
+        if number < 0:
+            raise ValueError("Number of items cannot be negative")
+        if capacity < 0:
+            raise ValueError("Capacity cannot be negative")
+
+        # Check if we have the right number of weight-cost pairs
+        if len(parts) != 3 + 2 * number:
+            raise ValueError(f"Expected {3 + 2 * number} values, got {len(parts)}")
+
+        weight_cost = [(parts[i], parts[i + 1]) for i in range(3, len(parts), 2)]
+
+        # Validate weight-cost pairs
+        for i, (weight, cost) in enumerate(weight_cost):
+            if weight < 0:
+                raise ValueError(f"Weight {i} cannot be negative")
+            if cost < 0:
+                raise ValueError(f"Cost {i} cannot be negative")
+
+        return inst_id, number, capacity, weight_cost
+    except ValueError as e:
+        raise ValueError(f"Invalid line format: {e}")
 
 
-def solver(method, inst_file_path, solution_file_path):
+def solver(method: Callable[[int, int, List[Tuple[int, int]]], Tuple[int, List[int]]],
+           inst_file_path: str, solution_file_path: str) -> None:
     """Main method that solves knapsack problem using one of the existing methods
 
     :param method: knapsack problem solving method
     :param inst_file_path: path to file with input instances
     :param solution_file_path: path to file where solver should write output data
+    :raises FileNotFoundError: if input file doesn't exist
+    :raises ValueError: if input data is invalid
     """
-    inst_file = open(inst_file_path, "r")
-    sol_file = open(solution_file_path, "w")
-
-    for line in inst_file:
-        inst_id, number, capacity, weight_cost = parse_line(line)
-        # get best cost and variables combination
-        best_cost, best_combination = method(number, capacity, weight_cost)
-        best_combination_str = " ".join("%s" % i for i in best_combination)
-        # write best result to file
-        sol_file.write("%s %s %s  %s\n" % (inst_id, number, best_cost, best_combination_str))
-
-    inst_file.close()
-    sol_file.close()
+    try:
+        with open(inst_file_path, "r") as inst_file, open(solution_file_path, "w") as sol_file:
+            for line_num, line in enumerate(inst_file, 1):
+                line = line.strip()
+                if not line:  # Skip empty lines
+                    continue
+                try:
+                    inst_id, number, capacity, weight_cost = parse_line(line)
+                    # get best cost and variables combination
+                    best_cost, best_combination = method(number, capacity, weight_cost)
+                    best_combination_str = " ".join(str(i) for i in best_combination)
+                    # write best result to file
+                    sol_file.write(f"{inst_id} {number} {best_cost}  {best_combination_str}\n")
+                except (ValueError, IndexError) as e:
+                    raise ValueError(f"Invalid data in line {line_num}: {e}")
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Input file not found: {inst_file_path}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Script solving the 0/1 knapsack problem')
-    parser.add_argument('-f', '--inst-file', required=True, type=str, dest="inst_file_path", 
+    parser.add_argument('-f', '--inst-file', required=True, type=str, dest="inst_file_path",
                         help='Path to inst *.dat file')
     parser.add_argument('-o', type=str, dest="solution_file_path", default="output.sol.dat",
                         help='Path to file where solutions will be saved. Default value: output.sol.dat')
@@ -101,4 +133,4 @@ if __name__ == "__main__":
         t_finish = time()
         solving_time += (t_finish - t_start)
 
-    print "Average solving time: %ss (repetitions count %s)" % (solving_time / args.repeat, args.repeat)
+    print(f"Average solving time: {solving_time / args.repeat}s (repetitions count {args.repeat})")
